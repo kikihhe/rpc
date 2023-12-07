@@ -1,5 +1,7 @@
 package com.xiaohe.consumer.common.future;
 
+import com.xiaohe.common.threadpool.ClientThreadPool;
+import com.xiaohe.consumer.common.callback.AsyncRPCCallback;
 import com.xiaohe.protocol.RpcProtocol;
 import com.xiaohe.protocol.request.RpcRequest;
 import com.xiaohe.protocol.response.RpcResponse;
@@ -7,11 +9,14 @@ import org.apache.log4j.lf5.LF5Appender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.AbstractQueuedSynchronizer;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author : 小何
@@ -85,6 +90,16 @@ public class RpcFuture extends CompletableFuture<Object> {
      */
     private long responseTimeThreshold = 5000;
 
+
+    /**
+     * 这个请求的所有回调方法
+     */
+    private List<AsyncRPCCallback> callbacks = new ArrayList<>();
+    /**
+     * 添加、执行 回调方法时用lock保证并发安全
+     */
+    private ReentrantLock lock = new ReentrantLock();
+
     public RpcFuture(RpcProtocol<RpcRequest> requestRpcProtocol) {
         this.sync = new Sync();
         this.requestRpcProtocol = requestRpcProtocol;
@@ -132,6 +147,8 @@ public class RpcFuture extends CompletableFuture<Object> {
         this.responseRpcProtocol = responseRpcProtocol;
         // 释放锁，将状态从pending改为done
         sync.release(1);
+        // 得到响应了，执行回调方法
+        invokeCallbacks();
         // 计算此次请求时间是否超过预期
         long responseTime = System.currentTimeMillis() - startTime;
         if (responseTime > this.responseTimeThreshold) {
@@ -139,6 +156,54 @@ public class RpcFuture extends CompletableFuture<Object> {
         }
     }
 
+    /**
+     * 执行所有的回调方法
+     */
+    private void invokeCallbacks() {
+        lock.lock();
+        try {
+            for (final AsyncRPCCallback callback : callbacks) {
+                runCallback(callback);
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * 添加回调方法
+     * @param callback
+     * @return
+     */
+    public RpcFuture addCallback(AsyncRPCCallback callback) {
+        lock.lock();
+        try {
+            // 如果请求已经完成，不需要将callback放入list了，直接执行
+            if (isDone()) {
+                runCallback(callback);
+            } else {
+                callbacks.add(callback);
+            }
+        } finally {
+            lock.unlock();
+        }
+        return this;
+    }
+
+    /**
+     * 执行某个回调方法
+     * @param callback
+     */
+    private void runCallback(AsyncRPCCallback callback) {
+        final RpcResponse res = this.responseRpcProtocol.getBody();
+        ClientThreadPool.submit(() -> {
+            if (!res.isError()) {
+                callback.onSuccess(res.getResult());
+            } else {
+                callback.onException(new RuntimeException("Response error", new Throwable(res.getError())));
+            }
+        });
+    }
 
     @Override
     public boolean isCancelled() {
