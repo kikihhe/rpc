@@ -1,6 +1,7 @@
 package com.xiaohe.consumer.common.handler;
 
 import com.alibaba.fastjson.JSONObject;
+import com.xiaohe.consumer.common.context.RpcContext;
 import com.xiaohe.consumer.common.future.RpcFuture;
 import com.xiaohe.protocol.RpcProtocol;
 import com.xiaohe.protocol.header.RpcHeader;
@@ -64,16 +65,45 @@ public class RpcConsumerHandler extends SimpleChannelInboundHandler<RpcProtocol<
         }
     }
 
+    public RpcFuture sendRequest(RpcProtocol<RpcRequest> protocol, boolean async,  boolean oneway) {
+        logger.info("服务消费者发送数据 : {}", JSONObject.toJSON(protocol));
+        return oneway ? this.sendRequestOneway(protocol) : async ? this.sendRequestAsync(protocol) : this.sendRequestSync(protocol);
+    }
+
     /**
-     * 服务消费者向服务提供者发送消息
+     * 异步方式 : 服务消费者向服务提供者发送消息
+     * @param protocol
+     * @return
+     */
+    public RpcFuture sendRequestAsync(RpcProtocol<RpcRequest> protocol) {
+        RpcFuture rpcFuture = this.getRpcFuture(protocol);
+        channel.writeAndFlush(rpcFuture);
+        // 将异步请求放入context，到后面可以根据请求找到响应
+        RpcContext.getContext().setRpcFuture(rpcFuture);
+        // 返回空，让调用者拿不到这个 RpcFuture 只能根据 requestId 从 Context 中取 RpcFuture 然后 get response
+        return null;
+    }
+
+    /**
+     * 同步方式 : 服务消费者向服务提供者发送消息
      * @param protocol
      */
-    public RpcFuture sendRequest(RpcProtocol<RpcRequest> protocol) {
-        logger.info("服务消费者发送数据 : {}", JSONObject.toJSON(protocol));
+    public RpcFuture sendRequestSync(RpcProtocol<RpcRequest> protocol) {
+//
         // 根据请求数据封装RPCFuture，将 requestId-RPCFuture 的键值对放入Map
         RpcFuture rpcFuture = this.getRpcFuture(protocol);
         channel.writeAndFlush(protocol);
         return rpcFuture;
+    }
+
+    /**
+     * 单端方式 : 服务消费者向服务提供者发送消息
+     * @param protocol
+     * @return
+     */
+    public RpcFuture sendRequestOneway(RpcProtocol<RpcRequest> protocol) {
+        channel.writeAndFlush(protocol);
+        return null;
     }
 
     /**

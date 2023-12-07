@@ -72,7 +72,7 @@ public class RpcConsumer {
             handler = getRpcConsumerHandler(serviceAddress, port);
             handlerMap.put(key, handler);
         }
-        return handler.sendRequest(protocol);
+        return handler.sendRequest(protocol, protocol.getBody().getAsync(), protocol.getBody().getOneway());
     }
 
     private RpcConsumerHandler getRpcConsumerHandler(String serviceAddress, int port) throws InterruptedException {
