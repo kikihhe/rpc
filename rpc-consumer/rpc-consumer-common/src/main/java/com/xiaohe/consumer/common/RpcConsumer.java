@@ -1,5 +1,6 @@
 package com.xiaohe.consumer.common;
 
+import com.xiaohe.consumer.common.future.RpcFuture;
 import com.xiaohe.consumer.common.handler.RpcConsumerHandler;
 import com.xiaohe.consumer.common.initializer.RpcConsumerInitializer;
 import com.xiaohe.protocol.RpcProtocol;
@@ -54,7 +55,7 @@ public class RpcConsumer {
      * 发送数据
       * @param protocol
      */
-    public Object sendRequest(RpcProtocol<RpcRequest> protocol) throws InterruptedException {
+    public RpcFuture sendRequest(RpcProtocol<RpcRequest> protocol) throws InterruptedException {
         // TODO 暂时写死，后续引入注册中心时，从注册中心获取
         String serviceAddress = "127.0.0.1";
         int port = 27880;
