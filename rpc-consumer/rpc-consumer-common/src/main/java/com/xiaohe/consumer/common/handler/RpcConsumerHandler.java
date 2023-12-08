@@ -87,7 +87,6 @@ public class RpcConsumerHandler extends SimpleChannelInboundHandler<RpcProtocol<
      * @param protocol
      */
     public RpcFuture sendRequestSync(RpcProtocol<RpcRequest> protocol) {
-//
         // 根据请求数据封装RPCFuture，将 requestId-RPCFuture 的键值对放入Map
         RpcFuture rpcFuture = this.getRpcFuture(protocol);
         channel.writeAndFlush(protocol);
