@@ -17,6 +17,7 @@
         <module>rpc-test-scanner</module>
         <module>rpc-test-provider</module>
         <module>rpc-test-consumer</module>
+        <module>rpc-test-registry</module>
     </modules>
 
     <properties>
