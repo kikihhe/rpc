@@ -19,6 +19,7 @@
         <module>rpc-consumer</module>
         <module>rpc-proxy</module>
         <module>rpc-test</module>
+        <module>rpc-regisrty</module>
     </modules>
 
     <properties>
