@@ -14,6 +14,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>rpc-provider-common</module>
+        <module>rpc-provider-native</module>
     </modules>
 
     <properties>

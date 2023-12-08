@@ -10,11 +10,12 @@
     </parent>
 
     <groupId>org.xiaohe</groupId>
-    <artifactId>rpc-consumer</artifactId>
+    <artifactId>rpc-test</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>rpc-consumer-common</module>
-        <module>rpc-consumer-native</module>
+        <module>rpc-test-api</module>
+        <module>rpc-test-scanner</module>
+        <module>rpc-test-provider</module>
     </modules>
 
     <properties>
@@ -22,9 +23,12 @@
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
     <dependencies>
-
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+        </dependency>
     </dependencies>
 
 </project>
