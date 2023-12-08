@@ -108,7 +108,7 @@ public class ClassScanner {
      * @param classNameList 类名称的集合
      */
     private static void findAndAddClassesInPackageByFile(String packageName, String packagePath, final boolean recursive, List<String> classNameList){
-        File dir = new File(packageName);
+        File dir = new File(packagePath);
         if (!dir.exists() || !dir.isDirectory()) {
             return;
         }
@@ -116,7 +116,7 @@ public class ClassScanner {
         File[] dirFiles = dir.listFiles(new FileFilter() {
             @Override
             public boolean accept(File file) {
-                return (recursive && file.isDirectory()) || file.getName().endsWith(".class");
+                return (recursive && file.isDirectory()) || (file.getName().endsWith(".class"));
             }
         });
         for (File file : dirFiles) {
@@ -130,7 +130,7 @@ public class ClassScanner {
             } else {
                 // 将.class后缀去掉
                 String className = file.getName().substring(0, file.getName().length() - 6);
-                classNameList.add(className);
+                classNameList.add(packageName + "." + className);
             }
         }
     }
