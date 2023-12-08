@@ -1,5 +1,6 @@
 package com.xiaohe.annotation;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.lang.annotation.ElementType;
@@ -12,9 +13,9 @@ import java.lang.annotation.Target;
  * @Description :
  * @date : 2023-12-03 16:24
  */
-@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Component
+@Target(ElementType.FIELD)
+@Autowired
 public @interface RpcReference {
     /**
      * 版本号
