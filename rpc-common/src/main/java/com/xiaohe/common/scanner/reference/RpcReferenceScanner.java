@@ -2,7 +2,6 @@ package com.xiaohe.common.scanner.reference;
 
 import com.xiaohe.annotation.RpcReference;
 import com.xiaohe.common.scanner.ClassScanner;
-import com.xiaohe.common.scanner.server.RpcServiceScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +17,7 @@ import java.util.stream.Stream;
  * @date : 2023-12-05 00:02
  */
 public class RpcReferenceScanner extends ClassScanner {
-    private static final Logger logger = LoggerFactory.getLogger(RpcServiceScanner.class);
+    private static final Logger logger = LoggerFactory.getLogger(RpcReferenceScanner.class);
 
     /**
      * 扫描指定包中使用了 @RpcReference 的变量
