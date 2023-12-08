@@ -1,4 +1,4 @@
-package com.xiaohe.consumer.common.callback;
+package com.xiaohe.proxy.api.callback;
 
 /**
  * @author : 小何

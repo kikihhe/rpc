@@ -1,6 +1,7 @@
 package com.xiaohe.consumer.common.context;
 
-import com.xiaohe.consumer.common.future.RpcFuture;
+
+import com.xiaohe.proxy.api.future.RpcFuture;
 
 /**
  * @author : 小何

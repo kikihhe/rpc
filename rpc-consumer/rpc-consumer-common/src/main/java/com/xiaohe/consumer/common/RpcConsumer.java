@@ -1,10 +1,12 @@
 package com.xiaohe.consumer.common;
 
-import com.xiaohe.consumer.common.future.RpcFuture;
+
 import com.xiaohe.consumer.common.handler.RpcConsumerHandler;
 import com.xiaohe.consumer.common.initializer.RpcConsumerInitializer;
 import com.xiaohe.protocol.RpcProtocol;
 import com.xiaohe.protocol.request.RpcRequest;
+import com.xiaohe.proxy.api.consumer.Consumer;
+import com.xiaohe.proxy.api.future.RpcFuture;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -24,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Description :
  * @date : 2023-12-06 15:20
  */
-public class RpcConsumer {
+public class RpcConsumer implements Consumer {
     private final Logger logger = LoggerFactory.getLogger(RpcConsumer.class);
     private final Bootstrap bootstrap;
     private final EventLoopGroup eventLoopGroup;

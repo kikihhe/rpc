@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.xiaohe</groupId>
-        <artifactId>rpc-consumer</artifactId>
+        <artifactId>rpc-proxy</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>rpc-consumer-common</artifactId>
+    <artifactId>rpc-proxy-api</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -20,13 +20,14 @@
     <dependencies>
         <dependency>
             <groupId>org.xiaohe</groupId>
-            <artifactId>rpc-codec</artifactId>
+            <artifactId>rpc-protocol</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.xiaohe</groupId>
-            <artifactId>rpc-proxy-jdk</artifactId>
-            <version>${project.version}</version>
+            <artifactId>rpc-protocol</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

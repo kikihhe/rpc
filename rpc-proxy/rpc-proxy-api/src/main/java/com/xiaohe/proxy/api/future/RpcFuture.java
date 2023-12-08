@@ -1,11 +1,11 @@
-package com.xiaohe.consumer.common.future;
+package com.xiaohe.proxy.api.future;
+
 
 import com.xiaohe.common.threadpool.ClientThreadPool;
-import com.xiaohe.consumer.common.callback.AsyncRPCCallback;
 import com.xiaohe.protocol.RpcProtocol;
 import com.xiaohe.protocol.request.RpcRequest;
 import com.xiaohe.protocol.response.RpcResponse;
-import org.apache.log4j.lf5.LF5Appender;
+import com.xiaohe.proxy.api.callback.AsyncRPCCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

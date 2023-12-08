@@ -2,19 +2,17 @@ package com.xiaohe.consumer.common.handler;
 
 import com.alibaba.fastjson.JSONObject;
 import com.xiaohe.consumer.common.context.RpcContext;
-import com.xiaohe.consumer.common.future.RpcFuture;
+
 import com.xiaohe.protocol.RpcProtocol;
-import com.xiaohe.protocol.header.RpcHeader;
 import com.xiaohe.protocol.request.RpcRequest;
 import com.xiaohe.protocol.response.RpcResponse;
+import com.xiaohe.proxy.api.future.RpcFuture;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
-import io.netty.util.concurrent.EventExecutorGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.SocketAddress;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
