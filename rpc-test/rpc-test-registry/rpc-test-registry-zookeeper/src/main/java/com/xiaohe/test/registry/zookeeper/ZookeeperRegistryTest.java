@@ -20,7 +20,7 @@ public class ZookeeperRegistryTest {
     // 注册元数据
     private ServiceMeta serviceMeta;
 
-    private String zookeeperAddress = "114.115.208.175:2181";
+    private String zookeeperAddress = "localhost:2181";
     private String registryType = "zookeeper";
     @Before
     public void init() throws Exception {
@@ -47,7 +47,7 @@ public class ZookeeperRegistryTest {
         String serviceGroup = serviceMeta.getServiceGroup();
 
         String key = RpcServiceHelper.buildServiceKey(serviceName, serviceVersion, serviceGroup);
-        ServiceMeta discover = this.registryService.discover(key, "xiaohe".hashCode());
+        ServiceMeta discover = this.registryService.discover(serviceName, "xiaohe_rpc".hashCode());
         System.out.println(discover);
     }
 

@@ -11,7 +11,7 @@ import org.junit.Test;
 public class RpcSingleServerTest {
     @Test
     public void startRpcSingleServer() {
-        RpcSingleServer singleServer = new RpcSingleServer("127.0.0.1:2780", "com.xiaohe.test", "cglib");
+        RpcSingleServer singleServer = new RpcSingleServer("127.0.0.1:27880", "localhost:2181", "zookeeper","com.xiaohe.test.provider", "cglib");
         singleServer.startNettyServer();
     }
 }

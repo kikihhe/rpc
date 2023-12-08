@@ -1,6 +1,5 @@
 package com.xiaohe.test.scanner;
 
-import com.xiaohe.annotation.RpcReference;
 import com.xiaohe.common.scanner.ClassScanner;
 import com.xiaohe.common.scanner.reference.RpcReferenceScanner;
 import com.xiaohe.common.scanner.server.RpcServiceScanner;
