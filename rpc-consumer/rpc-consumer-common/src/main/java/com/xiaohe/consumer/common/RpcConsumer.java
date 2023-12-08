@@ -60,7 +60,7 @@ public class RpcConsumer implements Consumer {
     public RpcFuture sendRequest(RpcProtocol<RpcRequest> protocol) throws InterruptedException {
         // TODO 暂时写死，后续引入注册中心时，从注册中心获取
         String serviceAddress = "127.0.0.1";
-        int port = 27880;
+        int port = 2780;
         // 组装key = ${serviceAddress}-${port}, 从Map中找handler
         String key = serviceAddress.concat("_").concat(String.valueOf(port));
         RpcConsumerHandler handler = handlerMap.get(key);
