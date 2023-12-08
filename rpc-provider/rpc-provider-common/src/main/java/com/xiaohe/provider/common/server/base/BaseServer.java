@@ -4,6 +4,9 @@ import com.xiaohe.codec.RpcDecoder;
 import com.xiaohe.codec.RpcEncoder;
 import com.xiaohe.provider.common.handler.RpcProviderHandler;
 import com.xiaohe.provider.common.server.api.Server;
+import com.xiaohe.registry.api.RegistryService;
+import com.xiaohe.registry.api.config.RegistryConfig;
+import com.xiaohe.registry.zookeeper.ZookeeperRegistryService;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -42,13 +45,26 @@ public class BaseServer implements Server {
      */
     private String reflectType;
 
-    public BaseServer(String serverAddress, String reflectType) {
+    /**
+     * 注册服务
+     */
+    protected RegistryService registryService;
+
+    /**
+     * 构造方法
+     * @param serverAddress 本机的server地址
+     * @param registryAddress 注册中心地址
+     * @param registryType 注册中心类型
+     * @param reflectType
+     */
+    public BaseServer(String serverAddress, String registryAddress, String registryType, String reflectType) {
         if (!StringUtils.isEmpty(serverAddress)) {
             String[] serverArray = serverAddress.split(":");
             this.host = serverArray[0];
             this.port = Integer.parseInt(serverArray[1]);
         }
         this.reflectType = reflectType;
+        this.registryService = getRegistryService(registryAddress, registryType);
     }
     @Override
     public void startNettyServer() {
@@ -78,5 +94,23 @@ public class BaseServer implements Server {
             workerGroup.shutdownGracefully();
             bossGroup.shutdownGracefully();
         }
+    }
+
+    /**
+     * 获取注册服务
+     * @param registryAddress 地址
+     * @param registryType 注册中心类型
+     * @return
+     */
+    private RegistryService getRegistryService(String registryAddress, String registryType) {
+        // TODO 现在只支持zookeeper，后续扩展Java SPI机制
+        RegistryService registryService = null;
+        try {
+            registryService = new ZookeeperRegistryService();
+            registryService.init(new RegistryConfig(registryAddress, registryType));
+        } catch (Exception e) {
+            logger.error("RPC Server init error");
+        }
+        return registryService;
     }
 }

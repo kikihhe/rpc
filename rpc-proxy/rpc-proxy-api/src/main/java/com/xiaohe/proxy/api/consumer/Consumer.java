@@ -3,6 +3,7 @@ package com.xiaohe.proxy.api.consumer;
 import com.xiaohe.protocol.RpcProtocol;
 import com.xiaohe.protocol.request.RpcRequest;
 import com.xiaohe.proxy.api.future.RpcFuture;
+import com.xiaohe.registry.api.RegistryService;
 
 /**
  * @author : 小何
@@ -16,5 +17,5 @@ public interface Consumer {
      * @return
      * @throws Exception
      */
-    RpcFuture sendRequest(RpcProtocol<RpcRequest> protocol) throws Exception;
+    RpcFuture sendRequest(RpcProtocol<RpcRequest> protocol, RegistryService registryService) throws Exception;
 }

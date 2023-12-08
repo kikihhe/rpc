@@ -58,7 +58,9 @@ public class ZookeeperRegistryService implements RegistryService {
 
     @Override
     public void register(ServiceMeta serviceMeta) throws Exception {
-        // 将本机信息构建为一个实例
+        // 将要注册的信息构建为一个实例
+        // name : serviceName#serviceVersion#group
+        // payload : serviceMeta
         ServiceInstance<ServiceMeta> serviceInstance = ServiceInstance.<ServiceMeta>builder()
                 .name(RpcServiceHelper.buildServiceKey(serviceMeta.getServiceName(), serviceMeta.getServiceVersion(), serviceMeta.getServiceGroup()))
                 .address(serviceMeta.getServiceAddr())

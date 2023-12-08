@@ -1,12 +1,17 @@
 package com.xiaohe.consumer.common;
 
 
+import com.xiaohe.common.helper.RpcServiceHelper;
+import com.xiaohe.common.threadpool.ClientThreadPool;
 import com.xiaohe.consumer.common.handler.RpcConsumerHandler;
+import com.xiaohe.consumer.common.helper.RpcConsumerHandlerHelper;
 import com.xiaohe.consumer.common.initializer.RpcConsumerInitializer;
 import com.xiaohe.protocol.RpcProtocol;
+import com.xiaohe.protocol.meta.ServiceMeta;
 import com.xiaohe.protocol.request.RpcRequest;
 import com.xiaohe.proxy.api.consumer.Consumer;
 import com.xiaohe.proxy.api.future.RpcFuture;
+import com.xiaohe.registry.api.RegistryService;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -55,26 +60,31 @@ public class RpcConsumer implements Consumer {
 
     /**
      * 发送数据
-      * @param protocol
+     * @param protocol 需要发送的数据
+     * @param registryService 注册服务
+     * @return
+     * @throws Exception
      */
-    public RpcFuture sendRequest(RpcProtocol<RpcRequest> protocol) throws InterruptedException {
-        // TODO 暂时写死，后续引入注册中心时，从注册中心获取
-        String serviceAddress = "127.0.0.1";
-        int port = 2780;
-        // 组装key = ${serviceAddress}-${port}, 从Map中找handler
-        String key = serviceAddress.concat("_").concat(String.valueOf(port));
-        RpcConsumerHandler handler = handlerMap.get(key);
-        // 看看有没有处理器，如果没有就创建一个添加到Map中
-        // 如果有但是死亡，关闭后重新创建
+    public RpcFuture sendRequest(RpcProtocol<RpcRequest> protocol, RegistryService registryService) throws Exception {
+        RpcRequest request = protocol.getBody();
+        String serviceKey = RpcServiceHelper.buildServiceKey(request.getClassName(), request.getVersion(), request.getGroup());
+        Object[] params = request.getParameters();
+        // 计算hashcode, 如果参数为空，使用serviceKey的hashCode，不为空就使用第一个参数的hashCode
+        int invokerHashCode = (params == null || params.length == 0) ? serviceKey.hashCode() : params[0].hashCode();
+        ServiceMeta serviceMeta = registryService.discover(serviceKey, invokerHashCode);
+        if (serviceMeta == null) {
+            return null;
+        }
+        RpcConsumerHandler handler = RpcConsumerHandlerHelper.get(serviceMeta);
         if (handler == null) {
-            handler = getRpcConsumerHandler(serviceAddress, port);
-            handlerMap.put(key, handler);
+            handler = getRpcConsumerHandler(serviceMeta.getServiceAddr(), serviceMeta.getServicePort());
+            RpcConsumerHandlerHelper.put(serviceMeta, handler);
         } else if (!handler.getChannel().isActive()) {
             handler.close();
-            handler = getRpcConsumerHandler(serviceAddress, port);
-            handlerMap.put(key, handler);
+            handler = getRpcConsumerHandler(serviceMeta.getServiceAddr(), serviceMeta.getServicePort());
+            RpcConsumerHandlerHelper.put(serviceMeta, handler);
         }
-        return handler.sendRequest(protocol, protocol.getBody().getAsync(), protocol.getBody().getOneway());
+        return handler.sendRequest(protocol, request.getAsync(), request.getOneway());
     }
 
     private RpcConsumerHandler getRpcConsumerHandler(String serviceAddress, int port) throws InterruptedException {
@@ -95,6 +105,8 @@ public class RpcConsumer implements Consumer {
     }
 
     public void close() {
+        RpcConsumerHandlerHelper.closeRpcClientHandler();
         eventLoopGroup.shutdownGracefully();
+        ClientThreadPool.shutdown();
     }
 }

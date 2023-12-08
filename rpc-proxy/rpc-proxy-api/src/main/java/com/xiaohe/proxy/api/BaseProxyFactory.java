@@ -14,12 +14,13 @@ public abstract class BaseProxyFactory<T> implements ProxyFactory {
 
     @Override
     public <T> void init(ProxyConfig<T> proxyConfig) {
-        objectProxy = new ObjectProxy(
+        objectProxy = new ObjectProxy (
                 proxyConfig.getClazz(),
                 proxyConfig.getServiceVersion(),
                 proxyConfig.getServiceGroup(),
                 proxyConfig.getSerializationType(),
                 proxyConfig.getTimeout(),
+                proxyConfig.getRegistryService(),
                 proxyConfig.getConsumer(),
                 proxyConfig.getAsync(),
                 proxyConfig.getOneway()

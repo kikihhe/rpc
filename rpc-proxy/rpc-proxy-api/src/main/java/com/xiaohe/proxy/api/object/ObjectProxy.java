@@ -6,6 +6,7 @@ import com.xiaohe.protocol.request.RpcRequest;
 import com.xiaohe.proxy.api.async.IAsyncObjectProxy;
 import com.xiaohe.proxy.api.consumer.Consumer;
 import com.xiaohe.proxy.api.future.RpcFuture;
+import com.xiaohe.registry.api.RegistryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,12 +39,16 @@ public class ObjectProxy<T> implements InvocationHandler, IAsyncObjectProxy {
     private boolean async;
 
     private boolean oneway;
+    /**
+     * 注册服务
+     */
+    private RegistryService registryService;
 
     public ObjectProxy(Class<T> clazz) {
         this.clazz = clazz;
     }
 
-    public ObjectProxy(Class<T> clazz, String serviceVersion, String serviceGroup, String serializationType, long timeout, Consumer consumer, boolean async, boolean oneway) {
+    public ObjectProxy(Class<T> clazz, String serviceVersion, String serviceGroup, String serializationType, long timeout, RegistryService registryService, Consumer consumer, boolean async, boolean oneway) {
         this.clazz = clazz;
         this.serviceVersion = serviceVersion;
         this.timeout = timeout;
@@ -52,6 +57,7 @@ public class ObjectProxy<T> implements InvocationHandler, IAsyncObjectProxy {
         this.serializationType = serializationType;
         this.async = async;
         this.oneway = oneway;
+        this.registryService = registryService;
     }
 
     @Override
@@ -98,7 +104,7 @@ public class ObjectProxy<T> implements InvocationHandler, IAsyncObjectProxy {
             }
         }
 
-        RpcFuture rpcFuture = this.consumer.sendRequest(requestRpcProtocol);
+        RpcFuture rpcFuture = this.consumer.sendRequest(requestRpcProtocol, registryService);
         // 一般情况下 future 不为空，内部的 response 可能为空
         // 如果有限等待，最多执行5s，
         // 如果 timeout <= 0 则无限等待至结果返回
@@ -111,7 +117,7 @@ public class ObjectProxy<T> implements InvocationHandler, IAsyncObjectProxy {
         RpcProtocol<RpcRequest> request = createRequest(this.clazz.getName(), funcName, args);
         RpcFuture rpcFuture = null;
         try {
-            rpcFuture = this.consumer.sendRequest(request);
+            rpcFuture = this.consumer.sendRequest(request, registryService);
         } catch (Exception e) {
             logger.error("async all throws exception:{}", e);
         }

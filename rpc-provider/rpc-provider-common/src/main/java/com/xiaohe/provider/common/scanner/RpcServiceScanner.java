@@ -1,13 +1,14 @@
-package com.xiaohe.common.scanner.server;
+package com.xiaohe.provider.common.scanner;
 
 
 import com.xiaohe.annotation.RpcService;
 import com.xiaohe.common.helper.RpcServiceHelper;
 import com.xiaohe.common.scanner.ClassScanner;
+import com.xiaohe.protocol.meta.ServiceMeta;
+import com.xiaohe.registry.api.RegistryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,7 @@ import java.util.Map;
 public class RpcServiceScanner extends ClassScanner {
     private static final Logger logger = LoggerFactory.getLogger(RpcServiceScanner.class);
 
-    public static Map<String, Object> doScannerWithRpcServiceAnnotationFilterAndRegistryService(String scanPackage) throws Exception {
+    public static Map<String, Object> doScannerWithRpcServiceAnnotationFilterAndRegistryService(String host, int port, String scanPackage, RegistryService registryService) throws Exception {
         Map<String, Object> handlerMap = new HashMap<>();
         List<String> classNameList = getClassNameList(scanPackage);
         if (classNameList.isEmpty()) {
@@ -31,9 +32,13 @@ public class RpcServiceScanner extends ClassScanner {
                 Class<?> clazz = Class.forName(className);
                 RpcService rpcService = clazz.getAnnotation(RpcService.class);
                 if (rpcService != null) {
-                    // TODO 后续会向注册中心注册服务的元数据，同时向 handlerMap 中记录标注了 RpcService 注解的类实例
                     String serviceName = getServiceName(rpcService);
-                    String key = RpcServiceHelper.buildServiceKey(serviceName, rpcService.version(), rpcService.group());
+                    String version = rpcService.version();
+                    String group = rpcService.group();
+                    ServiceMeta serviceMeta = new ServiceMeta(serviceName, version, group, host, port);
+                    // 注册
+                    registryService.register(serviceMeta);
+                    String key = RpcServiceHelper.buildServiceKey(serviceName, version, group);
                     handlerMap.put(key, clazz.newInstance());
                 }
             } catch (Exception e) {
