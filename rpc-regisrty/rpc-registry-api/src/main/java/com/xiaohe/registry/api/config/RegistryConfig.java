@@ -6,7 +6,7 @@ public class RegistryConfig implements Serializable {
     private static final long serialVersionUID = -7248658103788758893L;
 
     /**
-     * 注册地址
+     * zookeeper地址
      */
     private String registryAddr;
 
