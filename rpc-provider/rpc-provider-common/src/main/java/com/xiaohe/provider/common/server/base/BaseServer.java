@@ -14,6 +14,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,6 +41,15 @@ public class BaseServer implements Server {
      * 使用的代理类型，例如 jdk、cglib、javaassis
      */
     private String reflectType;
+
+    public BaseServer(String serverAddress, String reflectType) {
+        if (!StringUtils.isEmpty(serverAddress)) {
+            String[] serverArray = serverAddress.split(":");
+            this.host = serverArray[0];
+            this.host = serverArray[1];
+        }
+        this.reflectType = reflectType;
+    }
     @Override
     public void startNettyServer() {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
