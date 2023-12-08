@@ -1,6 +1,8 @@
 package com.xiaohe.consumer;
 
 import com.xiaohe.consumer.common.RpcConsumer;
+import com.xiaohe.proxy.api.ProxyFactory;
+import com.xiaohe.proxy.api.config.ProxyConfig;
 import com.xiaohe.proxy.jdk.JdkProxyFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,8 +50,9 @@ public class RpcClient {
         this.oneway = oneway;
     }
     public <T> T create(Class<T> interfaceClass) {
-        JdkProxyFactory<T> jdkProxyFactory = new JdkProxyFactory<>(serviceVersion, serviceGroup, serializationType, timeout, RpcConsumer.getInstance(), async, oneway);
-        return jdkProxyFactory.getProxy(interfaceClass);
+        ProxyFactory proxyFactory = new JdkProxyFactory<>();
+        proxyFactory.init(new ProxyConfig<>(interfaceClass, serviceVersion, serviceGroup, serializationType, timeout, RpcConsumer.getInstance(), async, oneway));
+        return proxyFactory.getProxy(interfaceClass);
     }
     public void shutdown() {
         RpcConsumer.getInstance().close();
