@@ -46,7 +46,7 @@ public class BaseServer implements Server {
         if (!StringUtils.isEmpty(serverAddress)) {
             String[] serverArray = serverAddress.split(":");
             this.host = serverArray[0];
-            this.host = serverArray[1];
+            this.port = Integer.parseInt(serverArray[1]);
         }
         this.reflectType = reflectType;
     }
