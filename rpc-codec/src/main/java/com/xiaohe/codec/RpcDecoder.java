@@ -64,11 +64,12 @@ public class RpcDecoder extends ByteToMessageDecoder implements RpcCodec {
         header.setMsgType(msgType);
         header.setSerializationType(serializationType);
         header.setMsgLen(dataLength);
-        Serialization jdkSerialization = getJDKSerialization();
+        // 获取序列化方式
+        Serialization serialization = getSerialization(serializationType);
         // 根据消息的类型做出不同的处理
         switch (msgTypeEnum) {
             case REQUEST:
-                RpcRequest request = jdkSerialization.deserialize(data, RpcRequest.class);
+                RpcRequest request = serialization.deserialize(data, RpcRequest.class);
                 if (request != null) {
                     RpcProtocol<RpcRequest> protocol = new RpcProtocol<>();
                     protocol.setHeader(header);
@@ -77,7 +78,7 @@ public class RpcDecoder extends ByteToMessageDecoder implements RpcCodec {
                 }
                 break;
             case RESPONSE:
-                RpcResponse response = jdkSerialization.deserialize(data, RpcResponse.class);
+                RpcResponse response = serialization.deserialize(data, RpcResponse.class);
                 if (response != null) {
                     RpcProtocol<RpcResponse> protocol = new RpcProtocol<>();
                     protocol.setHeader(header);

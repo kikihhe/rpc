@@ -8,6 +8,8 @@ import com.xiaohe.serialization.api.Serialization;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 
@@ -17,6 +19,7 @@ import java.nio.charset.StandardCharsets;
  * @date : 2023-12-04 16:02
  */
 public class RpcEncoder extends MessageToByteEncoder<RpcProtocol<Object>> implements RpcCodec {
+    private static final Logger logger = LoggerFactory.getLogger(RpcEncoder.class);
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, RpcProtocol<Object> msg, ByteBuf byteBuf) throws Exception {
         RpcHeader header = msg.getHeader();
@@ -28,11 +31,12 @@ public class RpcEncoder extends MessageToByteEncoder<RpcProtocol<Object>> implem
 
         String serializationType = header.getSerializationType();
         // TODO 序列化方式，扩展点
-        Serialization jdkSerialization = getJDKSerialization();
+        Serialization serialization = getSerialization(serializationType);
         // 将序列化方式写入ByteBuf
         byteBuf.writeBytes(SerializationUtil.paddingString(serializationType).getBytes(StandardCharsets.UTF_8));
         // 开始内容的序列化
-        byte[] data = jdkSerialization.serialize(msg.getBody());
+        byte[] data = serialization.serialize(msg.getBody());
+        logger.info("内容序列化后的长度为 : {} 字节", data.length);
         // 将内容长度写入ByteBuf
         byteBuf.writeInt(data.length);
         // 将消息体写入ByteBuf

@@ -20,6 +20,7 @@
         <module>rpc-proxy</module>
         <module>rpc-test</module>
         <module>rpc-regisrty</module>
+        <module>rpc-spi</module>
     </modules>
 
     <properties>

@@ -2,6 +2,7 @@ package com.xiaohe.codec;
 
 import com.xiaohe.serialization.api.Serialization;
 import com.xiaohe.serialization.jdk.JDKSerialization;
+import com.xiaohe.spi.loader.ExtensionLoader;
 
 /**
  * @author : 小何
@@ -9,11 +10,7 @@ import com.xiaohe.serialization.jdk.JDKSerialization;
  * @date : 2023-12-04 16:00
  */
 public interface RpcCodec {
-    /**
-     * 获取JDK序列化
-     * @return
-     */
-    default Serialization getJDKSerialization() {
-        return new JDKSerialization();
+    default Serialization getSerialization(String serializationType) {
+        return ExtensionLoader.getExtension(Serialization.class, serializationType);
     }
 }
