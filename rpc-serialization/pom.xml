@@ -16,6 +16,7 @@
         <module>rpc-serialization-api</module>
         <module>rpc-serialization-jdk</module>
         <module>rpc-serialization-json</module>
+        <module>rpc-serialization-hessian2</module>
     </modules>
 
     <properties>
