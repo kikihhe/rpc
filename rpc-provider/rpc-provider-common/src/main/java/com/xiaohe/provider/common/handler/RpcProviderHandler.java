@@ -2,22 +2,19 @@ package com.xiaohe.provider.common.handler;
 
 import com.xiaohe.common.helper.RpcServiceHelper;
 import com.xiaohe.common.threadpool.ServerThreadPool;
-import com.xiaohe.constants.RpcConstants;
 import com.xiaohe.protocol.RpcProtocol;
 import com.xiaohe.protocol.enumeration.RpcStatus;
 import com.xiaohe.protocol.enumeration.RpcType;
 import com.xiaohe.protocol.header.RpcHeader;
 import com.xiaohe.protocol.request.RpcRequest;
 import com.xiaohe.protocol.response.RpcResponse;
+import com.xiaohe.spi.loader.ExtensionLoader;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import net.sf.cglib.reflect.FastClass;
-import net.sf.cglib.reflect.FastMethod;
+import com.xiaohe.reflect.api.ReflectInvoker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
@@ -31,11 +28,11 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
 
     private final Map<String, Object> handlerMap;
 
-    private final String reflectType;
+    private final ReflectInvoker reflectInvoker;
 
     public RpcProviderHandler( String reflectType, Map<String, Object> handlerMap) {
         this.handlerMap = handlerMap;
-        this.reflectType = reflectType;
+        this.reflectInvoker = ExtensionLoader.getExtension(ReflectInvoker.class, reflectType);
     }
 
     /**
@@ -76,7 +73,7 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
         });
     }
 
-    private Object handle(RpcRequest requestBody) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+    private Object handle(RpcRequest requestBody) throws Throwable {
         String serviceKey = RpcServiceHelper.buildServiceKey(requestBody.getClassName(), requestBody.getVersion(), requestBody.getGroup());
         Object serviceBean = handlerMap.get(serviceKey);
         if (serviceBean == null) {
@@ -104,53 +101,10 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
             }
         }
 
-
-        Object result = invoke(serviceBean, serviceClass, methodName, parameterTypes, parameters);
+        Object result = reflectInvoker.invokeMethod(serviceBean, serviceClass, methodName, parameterTypes, parameters);
         return result;
     }
 
-    /**
-     * 挑选代理方式，执行
-     * @param serviceBean
-     * @param serviceClass
-     * @param methodName
-     * @param parameterTypes
-     * @param parameters
-     * @return
-     * @throws InvocationTargetException
-     * @throws NoSuchMethodException
-     * @throws IllegalAccessException
-     */
-    private Object invoke(Object serviceBean, Class<?> serviceClass, String methodName, Class<?>[] parameterTypes, Object[] parameters) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
-        switch(reflectType) {
-            case RpcConstants.REFLECT_TYPE_JDK :
-                return invokeJDKMethod(serviceBean, serviceClass, methodName, parameterTypes, parameters);
-            case RpcConstants.REFLECT_TYPE_CGLIB:
-                return invokeCglibMethod(serviceBean, serviceClass, methodName, parameterTypes, parameters);
-            default:
-                throw new IllegalArgumentException("not support reflect type");
-        }
-    }
-
-    /**
-     * 使用Cglib代理
-     */
-    private Object invokeCglibMethod(Object serviceBean, Class<?> serviceClass, String methodName, Class<?>[] parameterTypes, Object[] parameters) throws InvocationTargetException {
-        logger.info("use cglib reflect type invoke method");
-        FastClass serviceFastClass = FastClass.create(serviceClass);
-        FastMethod serviceFastMethod = serviceFastClass.getMethod(methodName, parameterTypes);
-        return serviceFastMethod.invoke(serviceBean, parameters);
-    }
-
-    /**
-     * 使用jdk动态代理
-     */
-    private Object invokeJDKMethod(Object serviceBean, Class<?> serviceClass, String methodName, Class<?>[] parameterTypes, Object[] parameters) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        logger.info("use jdk reflect type invoke method...");
-        Method method = serviceClass.getMethod(methodName);
-        method.setAccessible(true);
-        return method.invoke(serviceBean, parameters);
-    }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
