@@ -33,6 +33,11 @@
             <artifactId>rpc-registry-zookeeper</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.xiaohe</groupId>
+            <artifactId>rpc-proxy-cglib</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

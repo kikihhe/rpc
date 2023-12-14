@@ -10,6 +10,8 @@ import com.xiaohe.proxy.jdk.JdkProxyFactory;
 import com.xiaohe.registry.api.RegistryService;
 import com.xiaohe.registry.api.config.RegistryConfig;
 import com.xiaohe.registry.zookeeper.ZookeeperRegistryService;
+import com.xiaohe.spi.factory.ExtensionFactory;
+import com.xiaohe.spi.loader.ExtensionLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -54,8 +56,14 @@ public class RpcClient {
      */
     private RegistryService registryService;
 
-    public RpcClient(String registryAddress, String registryType, String serviceVersion, String serviceGroup, String serializationType, long timeout, boolean async, boolean oneway) {
+    /**
+     * 使用的动态代理
+     */
+    private String proxy;
+
+    public RpcClient(String registryAddress, String registryType, String proxy, String serviceVersion, String serviceGroup, String serializationType, long timeout, boolean async, boolean oneway) {
         this.serviceVersion = serviceVersion;
+        this.proxy = proxy;
         this.timeout = timeout;
         this.serviceGroup = serviceGroup;
         this.serializationType = serializationType;
@@ -64,7 +72,8 @@ public class RpcClient {
         this.registryService = this.getRegistryService(registryAddress, registryType);
     }
     public <T> T create(Class<T> interfaceClass) {
-        ProxyFactory proxyFactory = new JdkProxyFactory<>();
+        // 使用SPI机制获取动态代理
+        ProxyFactory proxyFactory = ExtensionLoader.getExtension(ProxyFactory.class, proxy);
         proxyFactory.init(new ProxyConfig<>(interfaceClass, serviceVersion, serviceGroup, serializationType, timeout, registryService, RpcConsumer.getInstance(), async, oneway));
 
         return proxyFactory.getProxy(interfaceClass);
