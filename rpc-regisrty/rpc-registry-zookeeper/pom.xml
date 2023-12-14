@@ -16,7 +16,17 @@
             <artifactId>rpc-registry-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.xiaohe</groupId>
+            <artifactId>rpc-loadbalancer-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
+        <dependency>
+            <groupId>org.xiaohe</groupId>
+            <artifactId>rpc-loadbalancer-random</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.curator</groupId>
             <artifactId>curator-framework</artifactId>

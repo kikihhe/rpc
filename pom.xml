@@ -22,6 +22,7 @@
         <module>rpc-regisrty</module>
         <module>rpc-spi</module>
         <module>rpc-reflect</module>
+        <module>rpc-loadbalancer</module>
     </modules>
 
     <properties>

@@ -1,6 +1,8 @@
 package com.xiaohe.registry.zookeeper;
 
 import com.xiaohe.common.helper.RpcServiceHelper;
+import com.xiaohe.loadbalancer.api.ServiceLoadBalancer;
+import com.xiaohe.loadbalancer.random.RandomServiceLoadBalancer;
 import com.xiaohe.protocol.meta.ServiceMeta;
 import com.xiaohe.registry.api.RegistryService;
 import com.xiaohe.registry.api.config.RegistryConfig;
@@ -37,6 +39,8 @@ public class ZookeeperRegistryService implements RegistryService {
 
     private ServiceDiscovery<ServiceMeta> serviceDiscovery;
 
+    private ServiceLoadBalancer<ServiceInstance<ServiceMeta>> serviceLoadBalancer;
+
     /**
      * 初始化，启动zookeeper客户端
      * @param registryConfig
@@ -53,6 +57,7 @@ public class ZookeeperRegistryService implements RegistryService {
                 .basePath(ZK_BASE_PATH)
                 .build();
         this.serviceDiscovery.start();
+        this.serviceLoadBalancer = new RandomServiceLoadBalancer<>();
 
     }
 
@@ -88,7 +93,7 @@ public class ZookeeperRegistryService implements RegistryService {
         // 根据serviceName拿到所有实例
         Collection<ServiceInstance<ServiceMeta>> serviceInstances = serviceDiscovery.queryForInstances(serviceName);
         // 负载均衡挑选一个
-        ServiceInstance<ServiceMeta> instance = this.selectOneServiceInstance((List<ServiceInstance<ServiceMeta>>) serviceInstances);
+        ServiceInstance<ServiceMeta> instance = this.serviceLoadBalancer.select((List<ServiceInstance<ServiceMeta>>) serviceInstances, invokerHashCode);
         // 不为空就返回元数据
         if (instance != null) {
             return instance.getPayload();
