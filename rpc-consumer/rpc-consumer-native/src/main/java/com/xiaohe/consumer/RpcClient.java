@@ -66,6 +66,7 @@ public class RpcClient {
     public <T> T create(Class<T> interfaceClass) {
         ProxyFactory proxyFactory = new JdkProxyFactory<>();
         proxyFactory.init(new ProxyConfig<>(interfaceClass, serviceVersion, serviceGroup, serializationType, timeout, registryService, RpcConsumer.getInstance(), async, oneway));
+
         return proxyFactory.getProxy(interfaceClass);
     }
     public <T> IAsyncObjectProxy createAsync(Class<T> interfaceClass) {

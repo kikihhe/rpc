@@ -60,6 +60,12 @@ public class ObjectProxy<T> implements InvocationHandler, IAsyncObjectProxy {
         this.registryService = registryService;
     }
 
+    /**
+     * 在动态代理时执行真正的方法：rpcConsumer.sendRequest(), 返回RpcFuture
+     * 隐藏RpcRequest的构建过程
+     * @return
+     * @throws Throwable
+     */
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (Object.class == method.getDeclaringClass()) {

@@ -2,6 +2,8 @@ package com.xiaohe.protocol.request;
 
 import com.xiaohe.protocol.base.RpcMessage;
 
+import java.util.Arrays;
+
 /**
  * @author : 小何
  * @Description : rpc请求
@@ -85,5 +87,17 @@ public class RpcRequest extends RpcMessage {
 
     public void setGroup(String group) {
         this.group = group;
+    }
+
+    @Override
+    public String toString() {
+        return "RpcRequest{" +
+                "className='" + className + '\'' +
+                ", methodName='" + methodName + '\'' +
+                ", parameterTypes=" + Arrays.toString(parameterTypes) +
+                ", parameters=" + Arrays.toString(parameters) +
+                ", version='" + version + '\'' +
+                ", group='" + group + '\'' +
+                '}';
     }
 }

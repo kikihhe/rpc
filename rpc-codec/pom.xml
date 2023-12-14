@@ -44,6 +44,11 @@
             <artifactId>rpc-serialization-hessian2</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.xiaohe</groupId>
+            <artifactId>rpc-serialization-protostuff</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

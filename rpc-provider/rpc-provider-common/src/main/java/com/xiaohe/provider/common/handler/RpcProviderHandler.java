@@ -47,6 +47,7 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, RpcProtocol<RpcRequest> request) throws Exception {
         ServerThreadPool.submit(() -> {
+            logger.info("收到来自调用者的消息 : {}", request);
             RpcHeader header = request.getHeader();
             // Header再利用
             header.setMsgType((byte) RpcType.RESPONSE.getType());

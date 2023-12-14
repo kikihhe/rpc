@@ -29,16 +29,19 @@ public class RpcServiceScanner extends ClassScanner {
         }
         classNameList.stream().forEach(className -> {
             try {
+                // 根据类名拿到class
                 Class<?> clazz = Class.forName(className);
+                // class上是否有 RpcService 注解
                 RpcService rpcService = clazz.getAnnotation(RpcService.class);
                 if (rpcService != null) {
                     String serviceName = getServiceName(rpcService);
                     String version = rpcService.version();
                     String group = rpcService.group();
                     ServiceMeta serviceMeta = new ServiceMeta(serviceName, version, group, host, port);
-                    // 注册
+                    // 将这个服务注册到Zookeeper上
                     registryService.register(serviceMeta);
                     String key = RpcServiceHelper.buildServiceKey(serviceName, version, group);
+                    // 将这个bean放入Map中
                     handlerMap.put(key, clazz.newInstance());
                 }
             } catch (Exception e) {

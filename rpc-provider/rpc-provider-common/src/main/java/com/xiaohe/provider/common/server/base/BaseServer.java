@@ -36,7 +36,10 @@ public class BaseServer implements Server {
     protected int port = 27110;
 
     /**
-     * 存储实体类关系
+     * 存储服务提供者的bean
+     * 启动 Server 前会将所有加了 @RpcService 注解的类放入其中
+     * key : serviceName#serviceVersion#group
+     * value : bean，例如 DemoServiceImpl
      */
     protected Map<String, Object> handlerMap = new HashMap<>();
 

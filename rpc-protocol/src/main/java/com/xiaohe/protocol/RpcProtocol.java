@@ -38,4 +38,12 @@ public class RpcProtocol<T> implements Serializable {
     public void setBody(T body) {
         this.body = body;
     }
+
+    @Override
+    public String toString() {
+        return "RpcProtocol{" +
+                "header=" + header +
+                ", body=" + body +
+                '}';
+    }
 }
